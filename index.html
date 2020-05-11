@@ -8,6 +8,7 @@
 
 </head>
 <body onload="outputForm.reset();">
+    
     <div class="outputContainer">
         <form id="outputForm">
             <textarea name="out" id="output" cols="2" rows="2" placeholder="Type Here!"></textarea>
@@ -30,7 +31,7 @@
                 <button class="fn">F11</button>
                 <button class="fn">F12</button>
                 <button class="fn">PRTSC</button>
-                <button class="fn">DEL</button>
+                <button class="fn" onclick="clearLabel()">DEL</button>
                 <button class="fn" style="margin-left: 10px;" onclick="outputForm.reset()">HOME</button>
                 <button class="fn">END</button>
                 <button class="fn">PGUP</button>
@@ -57,7 +58,7 @@
                 <button class="btn" onclick="num('-')">-</button>
             </div>
             <div class="row3">
-                <button class="btn" style="width: 6em;">TAB &#8677;</button>
+                <button class="btn" style="width: 6em;" onclick="alpha('\t')">TAB &#8677;</button>
                 <button class="btn" onclick="alpha('q')">Q</button>
                 <button class="btn" onclick="alpha('w')">W</button>
                 <button class="btn" onclick="alpha('e')">E</button>
@@ -89,14 +90,14 @@
                 <button class="btn" onclick="alpha('l')">L</button>
                 <button class="btn" onclick="alpha(';')">:<br>;</button>
                 <button class="btn" onclick="alpha('\u0027')">"<br>'</button>
-                <button class="btn" onclick="alpha('\n')" style="width: 9.25em;">&#8629;  ENTER</button>
+                <button class="btn" onclick=" enterKey()" style="width: 9.25em;">&#8629;  ENTER</button>
                 <button class="btn" style="margin-left: 10px;" onclick="num('4')"> < 4 </button>
                 <button class="btn" onclick="num('5')">5</button>
                 <button class="btn" onclick="num('6')">6 ></button>
                 <button class="btn"></button>
             </div>
             <div class="row5">
-                <button class="btn" style="width:9em;">SHIFT &#8679;</button>
+                <button class="btn" style="width:9em;" onclick="shiftLight('l')"><div id="lshift">SHIFT &#8679;</div></button>
                 <button class="btn" onclick="alpha('z')">Z</button>
                 <button class="btn" onclick="alpha('x')">X</button>
                 <button class="btn" onclick="alpha('c')">C</button>
@@ -107,7 +108,7 @@
                 <button class="btn" onclick="alpha(',')">< <br> ,</button>
                 <button class="btn" onclick="alpha('.')">> <br> .</button>
                 <button class="btn" onclick="alpha('/')">?<br>/</button>
-                <button class="btn" style="width: 11.35em;">&#8679;   SHIFT</button>
+                <button class="btn" style="width: 11.35em;" onclick="shiftLight('r')"> <div id="rshift">&#8679; SHIFT</div></button>
                 <button class="btn" style="margin-left: 10px;" onclick="num('1')"><br> 1 <br>END</button>
                 <button class="btn" onclick="num('2')"><br> 2 <br>&#8964;</button>
                 <button class="btn"  onclick="num('3')"> <br> 3 <br>PGDN</button>
@@ -132,17 +133,38 @@
             </div>
         </div>
         <div class="touchPad">
-            <button class="tpButton"></button>
+            <button class="tpButton"  onclick="tpclk()" ondblclick="tpdblclk()"></button>
             
         </div>
     </div>
     <script type="text/javascript">
         var capsl=false;
         var numl=false;
-        
+        var shift=false;
         //setInterval(function() {document.getElementById('output').scrollIntoView(false); },5);
-        
-    
+        var m=new Map();
+        m.set('`','~');
+        m.set('1','!');
+        m.set('2','@');
+        m.set('3','#');
+        m.set('4','$');
+        m.set('5','%');
+        m.set('6','^');
+        m.set('7','&');
+        m.set('8','*');
+        m.set('9','(');
+        m.set('0',')');
+        m.set('-','_');
+        m.set('=','+');
+        m.set('[','{');
+        m.set(']','}');
+        m.set('\\','|');
+        m.set(';',':');
+        m.set('\u0027','"');
+        m.set(',','<');
+        m.set('.','>');
+        m.set('/','?');
+        var col=['red','green','brown','cadetblue','chocolate','darkblue','darkcyan','darkgoldenrod','black','royalblue'];
         function light(){
             capsl=!capsl;
             //var color=document.getElementById('lightcap').style.color;
@@ -153,53 +175,82 @@
             }
             
         }
-    
-    function numLight(){
-        numl=!numl;
-        if(numl==true){
-                document.getElementById('lightnum').style.color='rgb(126, 8, 194)';
-        }else{
-            document.getElementById('lightnum').style.color='black';
+        function shiftLight(pos){
+            shift=!shift;
+            capsl=!capsl;
+            if(pos=='l'){
+                if(shift==true){
+                    document.getElementById("lshift").innerHTML = "SHIFT &#11014;";
+                }
+                else{
+                    document.getElementById("lshift").innerHTML = "SHIFT &#8679;";
+                }
+            }else{
+                if(shift==true){
+                    document.getElementById("rshift").innerHTML = "&#11014; SHIFT";
+                }
+                else{
+                    document.getElementById("rshift").innerHTML = "&#8679; SHIFT";
+                }
+            }
         }
-        
-    }
-    function alpha(alphabet){
-        var x= alphabet;
-        
-        if(x=='space'){
-            document.getElementById('output').value += ' ';
-        }else{
-            if(capsl==true){
-                x=x.toUpperCase();
+        function numLight(){
+            numl=!numl;
+            if(numl==true){
+                    document.getElementById('lightnum').style.color='rgb(126, 8, 194)';
+            }else{
+                document.getElementById('lightnum').style.color='black';
             }
             
-            document.getElementById('output').value += x;
-            
         }
+        function alpha(alphabet){
+            var x= alphabet;
+            if(x=='space'){
+                document.getElementById('output').value += ' ';
+            }else{
+                if(m.has(x) && shift ==true){
+                    x= (m.get(x));
+                }
+                if(capsl==true){
+                    x=x.toUpperCase();
+                }
+                
+                document.getElementById('output').value += x;
+                
+            }
+            document.getElementById("output").scrollTop = document.getElementById("output").scrollHeight;      
         
-    
-    }
-    function enterKey(){
-        document.getElementById('output').value +='\n';
-    }
-    function num(numkey){
-        if(numl==true){
-            document.getElementById('output').value += numkey;
         }
-    }	
-    function back(){
-        var x=document.getElementById('output').value;
-        x=x.toString();
-        if(x.length==1){
-            clearLabel();
-        }else{
-            x= x.substr(0,x.length-1);
-            
-            document.getElementById('output').value = x;
+        function enterKey(){
+            document.getElementById('output').value +='\n';
+            document.getElementById("output").scrollTop = document.getElementById("output").scrollHeight;      
         }
-    }
-    function clearLabel(){
-        document.getElementById('output').value='';
-    }
+        function num(numkey){
+            if(numl==true){
+                document.getElementById('output').value += numkey;
+            }
+            document.getElementById("output").scrollTop = document.getElementById("output").scrollHeight;      
+        }	
+        function back(){
+            var x=document.getElementById('output').value;
+            x=x.toString();
+            if(x.length==1){
+                clearLabel();
+            }else{
+                x= x.substr(0,x.length-1);
+                
+                document.getElementById('output').value = x;
+            }
+        }
+        function clearLabel(){
+            document.getElementById('output').value='';
+        }
+        function tpclk(){
+            document.getElementById('output').focus();
+            document.getElementById('output').select();
+        }
+        function tpdblclk(){
+            document.getElementById('output').style.color=col[Math.ceil(Math.random()*10)];
+        }
     </script>
 </body>
